@@ -1,0 +1,53 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: es-master-pdb
+spec:
+#  change to maxUnavailable after upgrade to 1.7
+#  maxUnavailable: 1
+# currently three nodes in the cluster, so make sure two are running at any given time
+  minAvailable: 2
+  selector:
+    matchLabels:
+      component: es
+      role: master
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: es-data-pdb
+spec:
+#  change to maxUnavailable after upgrade to 1.7
+#  maxUnavailable: 1
+# currently three nodes in the cluster, so make sure two are running at any given time
+  minAvailable: 2
+  selector:
+    matchLabels:
+      component: es
+      role: data
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: es-kibana-pdb
+spec:
+#  change to maxUnavailable after upgrade to 1.7
+#  maxUnavailable: 1
+  minAvailable: 1
+  selector:
+    matchLabels:
+      component: es
+      role: kibana
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: es-client-pdb
+spec:
+#  change to maxUnavailable after upgrade to 1.7
+#  maxUnavailable: 1
+  minAvailable: 1
+  selector:
+    matchLabels:
+      component: es
+      role: client

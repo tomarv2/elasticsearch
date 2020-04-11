@@ -1,0 +1,66 @@
+{
+  "description": "Filebeat Error Log Parser",
+  "processors": [
+    {
+      "grok": {
+        "field": "source",
+        "ignore_missing": true,
+        "patterns": [
+          "/var/log/containers/%{DATA:pod_name}_%{DATA:namespace}_%{GREEDYDATA:container_name}-%{DATA:container_id}.log"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "log",
+        "ignore_missing": true,
+        "pattern_definitions" : {
+          "FB_TIMESTAMP" : "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND}"
+
+        },
+        "patterns": [
+          "%{FB_TIMESTAMP:log_timestamp} %{DATA:code}: %{LOGLEVEL:loglevel} (?<message>(.|\r|\n)*)"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "pipeline_error",
+              "value": "parse_filebeat_stderr_log"
+            }
+          },
+          {
+            "set": {
+              "field": "raw_log",
+              "value": "{{log}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.name"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.hostname"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.version"
+      }
+    },
+    {
+      "remove": {
+        "field": "source"
+      }
+    },
+    {
+      "remove": {
+        "field": "log"
+      }
+    }
+  ]
+}

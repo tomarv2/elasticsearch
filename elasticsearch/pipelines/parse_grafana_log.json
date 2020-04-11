@@ -1,0 +1,62 @@
+{
+  "description": "Grafana Log Parser",
+  "processors": [
+    {
+      "grok": {
+        "field": "source",
+        "ignore_missing": true,
+        "patterns": [
+          "/var/log/containers/%{DATA:pod_name}_%{DATA:namespace}_%{GREEDYDATA:container_name}-%{DATA:container_id}.log"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "log",
+        "ignore_missing": true,
+        "patterns": [
+          "t=%{TIMESTAMP_ISO8601:log_timestamp} lvl=%{LOGLEVEL:loglevel} msg=\\\"%{DATA:message}\\\""
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "pipeline_error",
+              "value": "parse_grafana_log"
+            }
+          },
+          {
+            "set": {
+              "field": "message",
+              "value": "{{log}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.name"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.hostname"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.version"
+      }
+    },
+    {
+      "remove": {
+        "field": "source"
+      }
+    },
+    {
+      "remove": {
+        "field": "log"
+      }
+    }
+  ]
+}

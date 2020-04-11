@@ -1,0 +1,67 @@
+{
+  "mappings": {
+    "_default_": {
+      "_all": {
+        "enabled": true,
+        "norms": {
+          "enabled": false
+        }
+      },
+      "dynamic_templates": [
+        {
+          "template1": {
+            "mapping": {
+              "doc_values": true,
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "{dynamic_type}"
+            },
+            "match": "*"
+          }
+        }
+      ],
+      "properties": {
+        "timestamp": {
+          "type": "date"
+        },
+        "message": {
+          "type": "string",
+          "index": "analyzed"
+        },
+        "line": {
+          "type": "integer",
+          "doc_values": "true"
+        },
+        "offset": {
+          "type": "integer",
+          "doc_values": "true"
+        },
+        "xforwardedfor": {
+          "type": "ip"
+        },
+        "request-length": {
+          "type": "integer"
+        },
+        "upstream-bytes-sent": {
+          "type": "integer"
+        },
+        "upstream-response": {
+          "type": "integer"
+        },
+        "bytes-sent": {
+          "type": "integer"
+        },
+        "httpversion": {
+          "type": "float"
+        },
+        "time": {
+          "type": "date"
+        }
+      }
+    }
+  },
+  "settings": {
+    "index.refresh_interval": "5s"
+  },
+  "template": "nginx-ic-logs-*"
+}

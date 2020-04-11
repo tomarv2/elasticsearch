@@ -1,0 +1,71 @@
+{
+  "description": "Dropwizard Service App Log Parser",
+  "processors": [
+    {
+      "grok": {
+        "field": "source",
+        "ignore_missing": true,
+        "patterns": [
+          "/var/log/containers/%{DATA:pod_name}_%{DATA:namespace}_%{GREEDYDATA:container_name}-%{DATA:container_id}.log"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "log",
+        "ignore_missing": true,
+        "patterns": [
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{WORD:traceId}/%{WORD:spanId}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+-\\s+%{GREEDYDATA:message}",
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{WORD:traceId}/%{WORD:spanId}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+%{GREEDYDATA:message}",
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+-\\s+%{GREEDYDATA:message}",
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+%{GREEDYDATA:message}"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "pipeline_error",
+              "value": "parse_dw_app_log"
+            }
+          },
+          {
+            "set": {
+              "field": "raw_log",
+              "value": "{{log}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "raw_log",
+        "value": "{{log}}"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.name"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.hostname"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.version"
+      }
+    },
+    {
+      "remove": {
+        "field": "source"
+      }
+    },
+    {
+      "remove": {
+        "field": "log"
+      }
+    }
+  ]
+}

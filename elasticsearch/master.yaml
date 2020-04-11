@@ -1,0 +1,123 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: es-master
+  labels:
+    component: es
+    role: master
+spec:
+  replicas: 3
+  serviceName: "es-master-ss"
+#  "podManagementPolicy": "Parallel"
+  template:
+    metadata:
+      labels:
+        component: es
+        role: master
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: es-master
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - IPC_LOCK
+        image: docker.elastic.co/es/es:6.2.0
+        imagePullPolicy: Always
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CLUSTER_NAME
+          value: "devlabs"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: "NUMBER_OF_MASTERS"
+          value: "2"
+        - name: NODE_MASTER
+          value: "true"
+        - name: NODE_INGEST
+          value: "false"
+        - name: NODE_DATA
+          value: "false"
+        - name: HTTP_ENABLE
+          value: "false"
+        - name: MAX_LOCAL_STORAGE_NODES
+          value: "10"
+        - name: XPACK_SECURITY_ENABLED
+          value: "false"
+        - name: "ES_JAVA_OPTS"
+          value: "-Xms4g -Xmx4g"
+        - name: XPACK_SECURITY_ENABLED
+          value: "false"
+        - name: XPACK_MONITORING_ENABLED
+          value: "false"
+        - name: XPACK_ML_ENABLED
+          value: "false"
+        - name: XPACK_GRAPH_ENABLED
+          value: "false"
+        - name: XPACK_WATCHER_ENABLED
+          value: "false"
+        ports:
+        - containerPort: 9300
+          name: transport
+          protocol: TCP
+        volumeMounts:
+        - name: data-volume
+          mountPath: /var/lib/es
+        - name: log-volume
+          mountPath: /var/log/es
+        - name: es-config-volume
+          mountPath: /usr/share/es/config/es.yml
+          subPath: es.yml
+        - name: es-config-volume
+          mountPath: /usr/share/es/config/log4j2.properties
+          subPath: log4j2.properties
+        resources:
+          requests:
+            cpu: 2000m
+            memory: 8Gi
+          limits:
+            cpu: 4000m
+            memory: 8Gi
+        readinessProbe:
+          tcpSocket:
+            port: 9300
+          timeoutSeconds: 1
+          successThreshold: 1
+        livenessProbe:
+          tcpSocket:
+            port: 9300
+          periodSeconds: 60
+          timeoutSeconds: 1
+          successThreshold: 1
+      volumes:
+      - name: log-volume
+        emptyDir: {}
+      - name: es-config-volume
+        configMap:
+          name: es-config
+      initContainers:
+        - name: init-sysctl
+          image: busybox
+          command: ["sysctl", "-w", "vm.max_map_count=262144"]
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+  volumeClaimTemplates:
+  - metadata:
+      name: data-volume
+      annotations:
+        volume.beta.kubernetes.io/storage-class: thick-disk
+#        volume.beta.kubernetes.io/storage-class: gp2
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+

@@ -1,0 +1,45 @@
+# Default Kibana configuration from kibana-docker.
+
+server:
+  name: kibana
+  host: "0"
+
+elasticsearch:
+  url: http://es:9200
+  requestTimeout: 60000
+  shardTimeout: 60000
+
+logging:
+  json: false
+  verbose: true
+
+#es.username: elastic
+#es.password: changeme
+#xpack.monitoring.ui.container.es.enabled: true
+xpack:
+  security:
+    enabled: false
+
+#xpack:
+#  security:
+#    authc:
+#      realms:
+#        ldap1:
+#          type: ldap
+#          order: 0
+#          url: "ldaps://10.16.10.15:389"
+#          bind_dn: "cn=admin,ou=Service Accounts,ou=devlabs,dc=devlabs,dc=corp"
+#          bind_password: Dev123
+#          user_search:
+#            base_dn: "dc=devlabs,dc=corp"
+#            attribute: userPrincipalName
+#          group_search:
+#            base_dn: "dc=devlabs,dc=corp"
+#          files:
+#            role_mapping: "role_mapping.yml"
+#          unmapped_groups_as_roles: false
+#  monitoring:
+#    ui:
+#      container:
+#        es:
+#          enabled: true

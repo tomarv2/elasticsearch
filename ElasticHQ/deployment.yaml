@@ -1,0 +1,56 @@
+apiVersion: apps/v1beta2 # from kube1.9 use apps/v1
+kind: Deployment
+metadata:
+  name: elastichq
+  namespace: mgmt
+  labels:
+    app: ElasticHQ
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ElasticHQ
+  template:
+    metadata:
+      labels:
+        app: ElasticHQ
+    spec:
+      containers:
+      - name: elastichq
+        image: elastichq/es-hq
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 512m
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: elastichq
+  namespace: mgmt
+spec:
+  selector:
+    app: ElasticHQ
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: elastichq
+  namespace: mgmt
+spec:
+  rules:
+  - host: elastichq.xyz.com
+    http:
+      paths:
+      - backend:
+          serviceName: elastichq
+          servicePort: 5000

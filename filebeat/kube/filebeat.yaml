@@ -1,0 +1,82 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: filebeat-log-shipper
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        component: filebeat-log-shipper
+    spec:
+      nodeSelector:
+        minion: "true"
+      containers:
+      - name: filebeat-log-shipper
+#        image: docker.elastic.co/beats/filebeat:6.0.0-alpha1
+        image: dcr.xyz.com/devlabs/es/filebeat:v1
+        volumeMounts:
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/filebeat.yml
+          subPath: filebeat.yml
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/nifi-logs.template.json
+          subPath: nifi-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/sonarqube-logs.template.json
+          subPath: sonarqube-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/redis-logs.template.json
+          subPath: redis-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/jenkins-logs.template.json
+          subPath: jenkins-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/dw-dataengr-app-logs.template.json
+          subPath: dw-dataengr-app-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/spark-logs.template.json
+          subPath: spark-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/zookeeper-logs.template.json
+          subPath: zookeeper-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/kafka-logs.template.json
+          subPath: kafka-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/dw-services-access-logs.template.json
+          subPath: dw-services-access-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/dw-services-app-logs.template.json
+          subPath: dw-services-app-logs.template.json
+        - name: filebeat-config-volume
+          mountPath: /usr/share/filebeat/nginx-ic-logs.template.json
+          subPath: nginx-ic-logs.template.json
+        - name: filebeat-volume
+          mountPath: /var/lib/filebeat
+        - name: log-volume
+          mountPath: /var/log/containers
+          readOnly: true
+        - name: pod-volume
+          mountPath: /var/log/pods
+          readOnly: true
+        - name: docker-volume
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      volumes:
+      - name: data-volume
+        emptyDir: {}
+      - name: filebeat-volume
+        emptyDir: {}
+      - name: filebeat-config-volume
+        configMap:
+          name: filebeat-config
+      - name: log-volume
+        hostPath:
+          path: /var/log/containers
+      - name: pod-volume
+        hostPath:
+          path: /var/log/pods
+      - name: docker-volume
+        hostPath:
+          path: /var/lib/docker/containers

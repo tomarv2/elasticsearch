@@ -1,0 +1,258 @@
+ processors:
+- kubernetes:
+    in_cluster: true
+    namespace: default
+
+output:
+  elasticsearch:
+    hosts: ["es.aur.test.xyz.com:9200"]
+    index: "kubernetes-logs-%{+yyyy.MM.dd}"
+    bulk_max_body_size: 10M
+    bulk_max_size: 50
+
+    indices:
+      - index: "nifi-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_nifi_log
+        template:
+          - name: nifi-logs-template
+          - path: nifi-logs.template.json
+        when:
+          or:
+            - contains.source: "sync"
+            - contains.source: "nifi"
+      - index: "redis-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_redis_log
+        template:
+          - name: redis-logs-template
+          - path: redis-logs.template.json
+        when:
+          and:
+            - contains.source: "redis"
+            - not.contains.source: "dataengr"
+      - index: "jenkins-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_jenkins_log
+        template:
+          - name: jenkins-logs-template
+          - path: jenkins-logs.template.json
+        when:
+          or:
+            - contains.source: "jenkins"
+      - index: "dw-dataengr-access-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_dataengr_access_log
+        template:
+          - name: dw-services-access-logs-template
+          - path: dw-services-access-logs.template.json
+        when:
+          and:
+           - contains.source: "dataengr"
+           - not.contains.source: "nifi"
+           - not.contains.source: "sync"
+           - not.contains.source: "spark"
+           - not.contains.source: "transform"
+           - equals.stream: "stdout"
+      - index: "dw-dataengr-app-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_dataengr_app_log
+        template:
+          - name: dw-dataengr-app-logs-template
+          - path: dw-dataengr-app-logs.template.json
+        when:
+          and:
+           - contains.source: "dataengr"
+           - not.contains.source: "nifi"
+           - not.contains.source: "sync"
+           - not.contains.source: "spark"
+           - not.contains.source: "transform"
+           - equals.stream: "stderr"
+      - index: "spark-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_spark_log
+        template:
+          - name: spark-logs-template
+          - path: spark-logs.template.json
+        when:
+          and:
+           - contains.source: "transform"
+           - not.contains.source: "sparkpost"
+      - index: "nginx-ic-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_nginx_ic_log
+        template:
+          - name: nginx-ic-logs-template
+          - path: nginx-ic-logs.template.json
+        when:
+          contains:
+            source: "nginx-ingress-controller"
+      - index: "dw-services-access-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_access_log
+        template:
+          - name: dw-services-access-logs-template
+          - path: dw-services-access-logs.template.json
+        when:
+          and:
+            - equals.stream: "stdout"
+            - contains.source: "_services_"
+      - index: "dw-services-app-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_app_log
+        template:
+          - name: dw-services-app-logs-template
+          - path: dw-services-app-logs.template.json
+        when:
+          and:
+            - equals.stream: "stderr"
+            - contains.source: "_services_"
+      - index: "kubernetes-stderr-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_access_log
+        when:
+          and:
+            - equals.stream: "stderr"
+            - not.contains.source: "_services_"
+      - index: "kubernetes-stdout-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_app_log
+        when:
+          and:
+            - equals.stream: "stdout"
+            - not.contains.source: "_services_"
+      - index: "lms-drupal-stdout-logs-%{+yyyy.MM.dd}"
+        when:
+          and:
+            - equals.stream: "stdout"
+            - contains.source: "lms-drupal"
+      - index: "sonarqube-logs-%{+yyyy.MM.dd}"
+        template:
+          - name: sonarqube-logs-template
+          - path: sonarqube-logs.template.json
+        when:
+          contains:
+            source: "app[]"
+
+    pipelines:
+      - pipeline: parse_nginx_ic_log
+        when:
+          contains:
+            source: "nginx-ingress-controller"
+#
+      - pipeline: parse_influxdb_log
+        when:
+          contains.source: "influxdb"
+#
+      - pipeline: parse_nifi_log
+        when:
+          or:
+            - contains.source: "nifi"
+            - contains.source: "sync"
+#
+      - pipeline: parse_redis_log
+        when:
+          and:
+            - contains.source: "redis"
+#
+      - pipeline: parse_jenkins_log
+        when:
+          and:
+            - contains.source: "jenkins"
+#
+      - pipeline: parse_spark_log
+        when:
+          and:
+            - contains.source: "transform"
+            - not.contains.source: "sparkpost"
+#
+      - pipeline: parse_grafana_log
+        when:
+          contains.source: "grafana"
+#
+      - pipeline: parse_lms_log
+        when:
+          contains.log: "lms-drupal"
+#
+      - pipeline: parse_zipkin_log
+        when:
+          contains.source: "zipkin"
+#
+      - pipeline: parse_generic_log
+        when:
+          contains.source: "zip-blog"
+#
+      - pipeline: parse_generic_log
+        when:
+          contains.source: "zap-blog"
+#
+      - pipeline: parse_generic_log
+        when:
+          contains.source: "cb-landing"
+#
+      - pipeline: parse_generic_log
+        when:
+          contains.source: "kibana"
+#
+      - pipeline: parse_es_log
+        when:
+          contains.source: "containers/es-"
+#
+      - pipeline: parse_generic_log
+        when:
+          contains.source: "kubernetes-dashboard"
+#
+      - pipeline: parse_filebeat_stderr_log
+        when:
+          and:
+            - contains.source: "containers/filebeat-"
+            - equals.stream: "stderr"
+#
+      - pipeline: parse_dw_access_log
+        when:
+          and:
+            - equals.stream: "stdout"
+            - contains.source: "_services_"
+#
+      - pipeline: parse_dw_app_log
+        when:
+          and:
+            - equals.stream: "stderr"
+            - contains.source: "_services_"
+#
+      - pipeline: parse_dw_access_log
+        when:
+          and:
+            - equals.stream: "stdout"
+            - contains.source: "dataengr"
+#
+      - pipeline: parse_dw_dataengr_app_log
+        when:
+          and:
+            - equals.stream: "stderr"
+            - contains.source: "dataengr"
+#
+      - pipeline: parse_generic_log
+
+
+filebeat:
+  # List of prospectors to fetch data.
+  prospectors:
+    - type: log
+      enabled: true
+      symlinks: true
+      paths:
+        - /var/log/containers/*.log
+      exclude_lines: ['GET /healthcheck']
+      fields_under_root: true
+      reload.enabled: true
+      reload.period: 60s
+      fields:
+        environment: ${K8S_ENVIRONMENT:AWS}
+      json:
+        keys_under_root: true
+        overwrite_keys: true
+        add_error_key: true
+        message_key: log
+      multiline.negate: false
+      multiline.match: after
+      multiline.negate: false
+      multiline.pattern: '^${patterns.format2}'
+  registry_file: /var/lib/filebeat/registry
+patterns:
+  format1: '(ERROR|INFO|DEBUG|WARN|TRACE)'
+  format2: '(\s+|Caused by:|[A-Za-z]+\.[A-Za-z]+\.[A-Za-z]+)'
+
+logging:
+  level: info
+  files:
+    rotateeverybytes: 26214400 # = 25MB

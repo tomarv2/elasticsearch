@@ -1,0 +1,95 @@
+{
+  "description": "Data Services App Log Parser",
+  "processors": [
+    {
+      "grok": {
+        "field": "source",
+        "ignore_missing": true,
+        "patterns": [
+          "/var/log/containers/%{DATA:pod_name}_%{DATA:namespace}_%{GREEDYDATA:container_name}-%{DATA:container_id}.log"
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "debug_log",
+        "value": "{{log}}"
+      }
+    },
+    {
+      "grok": {
+        "field": "log",
+        "ignore_missing": true,
+        "patterns": [
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{WORD:traceId}/%{WORD:spanId}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+-\\s+%{GREEDYDATA:raw_message}",
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{WORD:traceId}/%{WORD:spanId}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+%{GREEDYDATA:raw_message}",
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+-\\s+%{GREEDYDATA:raw_message}",
+          "%{LOGLEVEL:logLevel}\\s+\\[%{TIMESTAMP_ISO8601:logtime}\\]\\s+\\[%{DATA:thread}\\]\\s+%{DATA:class}\\s+%{GREEDYDATA:raw_message}",
+          "%{GREEDYDATA:raw_message}"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "pipeline_error",
+              "value": "parse_dw_dataengr_app_log"
+            }
+          },
+          {
+            "set": {
+              "field": "raw_message",
+              "value": "{{log}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "raw_message",
+        "ignore_missing": true,
+        "patterns": [
+          "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{WORD:Severity}\\]\\[%{WORD:errorcode}\\]\\[%{LOGLEVEL:Loglevel}\\]\\[%{WORD:PipelineName}\\]\\[%{WORD:EntityName}\\]\\[%{WORD:ModuleName}\\]\\[%{JAVACLASS:GroupName}\\]\\[%{WORD:ProcessorName}\\]%{GREEDYDATA:message}",
+          "\\[\\]\\[\\]\\[%{WORD:pipeline_name}\\]\\[%{WORD:entity_name}\\]\\[%{WORD:module_name}\\]\\[\\]%{GREEDYDATA:message}"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "message",
+              "value": "{{raw_message}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.name"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.hostname"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.version"
+      }
+    },
+    {
+      "remove": {
+        "field": "source"
+      }
+    },
+    {
+      "remove": {
+        "field": "log"
+      }
+    },
+    {
+      "remove": {
+        "field": "raw_message"
+      }
+    }
+  ]
+}

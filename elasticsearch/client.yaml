@@ -1,0 +1,126 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: es-client
+  labels:
+    component: es
+    role: client
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        component: es
+        role: client
+#      annotations:
+#        pod.beta.kubernetes.io/init-containers: '[
+#          {
+#          "name": "sysctl",
+#            "image": "busybox",
+#            "imagePullPolicy": "IfNotPresent",
+#            "command": ["sysctl", "-w", "vm.max_map_count=262144"],
+#            "securityContext": {
+#              "privileged": true
+#            }
+#          }
+#        ]'
+    spec:
+      initContainers:
+        - name: init-sysctl
+          image: busybox
+          command: ["sysctl", "-w", "vm.max_map_count=262144"]
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+      containers:
+      - name: es-client
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - IPC_LOCK
+              - SYS_RESOURCE
+        image: docker.elastic.co/es/es:6.2.0
+        imagePullPolicy: Always
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CLUSTER_NAME
+          value: "devlabs"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_MASTER
+          value: "false"
+        - name: NODE_DATA
+          value: "false"
+        - name: NODE_INGEST
+          value: "true"
+        - name: HTTP_ENABLE
+          value: "true"
+        - name: HTTP_CORS_ENABLE
+          value: "true"
+        - name: MAX_LOCAL_STORAGE_NODES
+          value: "10"
+        - name: XPACK_SECURITY_ENABLED
+          value: "false"
+        - name: "ES_JAVA_OPTS"
+          value: "-Xms4g -Xmx4g"
+        - name: XPACK_MONITORING_ENABLED
+          value: "false"
+        - name: XPACK_ML_ENABLED
+          value: "false"
+        - name: XPACK_GRAPH_ENABLED
+          value: "false"
+        - name: XPACK_WATCHER_ENABLED
+          value: "false"
+        ports:
+        - containerPort: 9200
+          name: http
+          protocol: TCP
+        - containerPort: 9300
+          name: transport
+          protocol: TCP
+        volumeMounts:
+        - name: data-volume
+          mountPath: /var/lib/es
+        - name: log-volume
+          mountPath: /var/log/es
+        - name: es-config-volume
+          mountPath: /usr/share/es/config/es.yml
+          subPath: es.yml
+        - name: es-config-volume
+          mountPath: /usr/share/es/config/log4j2.properties
+          subPath: log4j2.properties
+        resources:
+          requests:
+            cpu: 3000m
+            memory: 8Gi
+          limits:
+            cpu: 3000m
+            memory: 8Gi
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 5
+      volumes:
+      - name: data-volume
+        emptyDir: {}
+      - name: log-volume
+        emptyDir: {}
+      - name: es-config-volume
+        configMap:
+          name: es-config

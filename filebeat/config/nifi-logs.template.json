@@ -1,0 +1,215 @@
+{
+   "mappings" : {
+     "doc" : {
+       "_all": { "enabled": false  },
+       "properties" : {
+         "@timestamp" : {
+           "type" : "date"
+         },
+         "beat" : {
+           "type" : "object"
+         },
+         "class" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "container_id" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "container_name" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "environment" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "input_type" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "log_timestamp" : {
+           "type" : "date"
+         },
+         "loglevel" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "logtime" : {
+           "type" : "date",
+           "format": "strict_date_optional_time||epoch_millis",
+           }
+         },
+         "message" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "namespace" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "offset" : {
+           "type" : "long"
+         },
+         "pipeline_error" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "pod_name" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "raw_log" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "stream" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "thread" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "type" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "module_name" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "pipeline_name" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "entity_name" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "process_group_name" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "processor_name" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "EntityName" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         },
+         "severity" : {
+           "type" : "text",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             }
+           }
+         }
+       }
+     }
+   }
+ }

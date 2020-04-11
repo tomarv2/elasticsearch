@@ -1,0 +1,83 @@
+{
+  "description": "nginx Ingress Controller Log Parser",
+  "processors": [
+    {
+      "grok": {
+        "field": "source",
+        "ignore_missing": true,
+        "patterns": [
+          "/var/log/containers/%{DATA:pod_name}_%{DATA:namespace}_%{GREEDYDATA:container_name}-%{DATA:container_id}.log"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "log",
+        "ignore_missing": true,
+        "patterns": [
+          "%{IPORHOST:client-ip} - \\[%{IPORHOST:xforwardedfor}\\] - %{DATA:ident} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|-)\" %{NUMBER:response} (?:%{NUMBER:bytes-sent}|-) (?:\"(?:%{URI:referrer}|-)\") %{QS:user-agent} %{NUMBER:request-length} %{NUMBER:response-time} %{DATA:upstream-proxy} %{NUMBER:upstream-bytes-sent} %{NUMBER:upstream-response-time} %{NUMBER:upstream-response}",
+          "\\s- \\[\\] - - \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|-)\" %{NUMBER:response} (?:%{NUMBER:bytes-sent}|-) (?:\"(?:%{URI:referrer}|-)\") %{QS:user-agent} %{NUMBER:request-length} %{NUMBER:response-time} %{DATA:upstream-proxy} %{NUMBER:upstream-bytes-sent} %{NUMBER:upstream-response-time} %{NUMBER:upstream-response}"
+        ],
+        "on_failure": [
+          {
+            "grok": {
+              "field": "log",
+              "ignore_missing": true,
+              "pattern_definitions" : {
+                "FB_TIMESTAMP" : "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND}"
+              },
+              "patterns": [
+                "%{FB_TIMESTAMP:log_timestamp} \\[%{LOGLEVEL:loglevel}\\] %{NUMBER:process}#%{NUMBER:thread}: \\*%{NUMBER:cid} %{GREEDYDATA:message}"
+              ],
+              "on_failure": [
+                {
+                  "set": {
+                    "field": "pipeline_error",
+                    "value": "parse_nginx_ic_log"
+                  }
+                },
+                {
+                  "set": {
+                    "field": "raw_log",
+                    "value": "{{log}}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "raw_log",
+        "value": "{{log}}"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.name"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.hostname"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.version"
+      }
+    },
+    {
+      "remove": {
+        "field": "source"
+      }
+    },
+    {
+      "remove": {
+        "field": "log"
+      }
+    }
+  ]
+}

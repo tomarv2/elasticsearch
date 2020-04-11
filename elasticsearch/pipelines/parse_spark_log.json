@@ -1,0 +1,77 @@
+{
+  "description": "Spark Log Parser",
+  "processors": [
+    {
+      "grok": {
+        "field": "source",
+        "ignore_missing": true,
+        "patterns": [
+          "/var/log/containers/%{DATA:pod_name}_%{DATA:namespace}_%{GREEDYDATA:container_name}-%{DATA:container_id}.log"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "log",
+        "ignore_missing": true,
+        "patterns": [
+          "(?<Logtime>\\d{2}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}) %{LOGLEVEL:LogLevel} %{WORD:JavaClass}: \\[%{TIMESTAMP_ISO8601:Log_TimeStamp}\\]\\[%{DATA:Severity}\\]\\[%{DATA:ErrorCode}\\]\\[%{DATA:Log_Level}\\]\\[%{WORD:PipelineName}\\]\\[%{DATA:EntityName}\\]\\[%{DATA:ModuleName}\\]\\[%{DATA:GroupName}\\]\\[%{DATA:ProcessorName}\\]%{GREEDYDATA:Message}"
+        ],
+        "on_failure": [
+          {
+            "grok": {
+              "field": "log",
+              "ignore_missing": true,
+              "pattern_definitions" : {
+                "FB_TIMESTAMP" : "%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND},%{SECOND}"
+              },
+              "patterns": [
+                "%{FB_TIMESTAMP:log_timestamp} %{LOGLEVEL:loglevel} %{GREEDYDATA:message}"
+              ],
+              "on_failure": [
+                {
+                  "set": {
+                    "field": "pipeline_error",
+                    "value": "parse_spark_log"
+                  }
+                },
+                {
+                  "set": {
+                    "field": "raw_log",
+                    "value": "{{log}}"
+                  }
+                }
+              ]
+            }
+          }
+
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.name"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.hostname"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.version"
+      }
+    },
+    {
+      "remove": {
+        "field": "source"
+      }
+    },
+    {
+      "remove": {
+        "field": "log"
+      }
+    }
+  ]
+}

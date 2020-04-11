@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  name: testcurator
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testcurator
+  template:
+    metadata:
+      name: testcurator
+      labels:
+        app: testcurator
+    spec:
+      containers:
+      - name: testcurator
+        securityContext:
+          privileged: true
+        image: bobrik/curator
+        args:
+         - --config
+         - /etc/config/config.yml
+         - /etc/config/action_file.yml
+        ports:
+         - containerPort: 9000
+         - containerPort: 8084
+        volumeMounts:
+          - mountPath: /etc/config
+            name: config-volume
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: curator-config
+          name: config-volume

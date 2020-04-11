@@ -1,0 +1,63 @@
+
+{
+  "description": "Zipkin Log Parser",
+  "processors": [
+    {
+      "grok": {
+        "field": "source",
+        "ignore_missing": true,
+        "patterns": [
+          "/var/log/containers/%{DATA:pod_name}_%{DATA:namespace}_%{GREEDYDATA:container_name}-%{DATA:container_id}.log"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "log",
+        "ignore_missing": true,
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:log_timestamp}%{SPACE}%{LOGLEVEL:loglevel} %{NUMBER} --- \\[%{SPACE}%{DATA:method}\\] %{DATA:class}${SPACE}: %{GREEDYDATA:message}"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "pipeline_error",
+              "value": "parse_zipkin_log"
+            }
+          },
+          {
+            "set": {
+              "field": "message",
+              "value": "{{log}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.name"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.hostname"
+      }
+    },
+    {
+      "remove": {
+        "field": "beat.version"
+      }
+    },
+    {
+      "remove": {
+        "field": "source"
+      }
+    },
+    {
+      "remove": {
+        "field": "log"
+      }
+    }
+  ]
+}

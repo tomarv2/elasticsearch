@@ -1,0 +1,206 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curator-config
+data:
+  action_file.yml: |-
+    ---
+    actions:
+      1:
+        action: delete_indices
+        description: "Indexes to keep for 14 days"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: '^(nginx-ic-logs)-.*$'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 14
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+      2:
+        action: delete_indices
+        description: "Indexes to keep for 14 days"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: '^(kubernetes-stdout-logs|kubernetes-stderr-logs|kubernetes-logs)-.*$'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 14
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+      3:
+        action: delete_indices
+        description: "Indexes to keep for 21 days"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: '^(dw-services-app-logs|dw-services-access-logs)-.*$'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 21
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+      4:
+        action: delete_indices
+        description: "Delete Zipkin indexes more than 21 days old"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: '^(zipkin)-.*$'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y-%m-%d'
+          unit: days
+          unit_count: 21
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+      5:
+        action: delete_indices
+        description: "Delete nifi indexes more than 14 days old"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: prefix
+          kind: regex
+          value: '^.*nifi.*'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 14
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+      6:
+        action: delete_indices
+        description: "Delete dw-dataengr-logs indexes more than 14 days old"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: '^.*dw-dataengr.*'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 14
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+      7:
+        action: delete_indices
+        description: "Delete kafka-logs indexes more than 14 days old"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: '^.*kafka.*'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 14
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+      8:
+        action: delete_indices
+        description: "Delete zookeeper-logs indexes more than 14 days old"
+        options:
+          ignore_empty_list: True
+          continue_if_exception: False
+          disable_action: False
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: '^.*zookeeper.*'
+          exclude: False
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 14
+          field:
+          stats_result:
+          epoch:
+          exclude: False
+  config.yml: |-
+    ---
+    client:
+      hosts:
+        - elasticsearch 
+      port: 9200
+      url_prefix:
+      use_ssl: False
+      certificate:
+      client_cert:
+      client_key:
+      ssl_no_validate: False
+      http_auth:
+      timeout: 30
+      master_only: False
+
+    logging:
+      loglevel: INFO
+      logfile:
+      logformat: default
+      blacklist: ['elasticsearch', 'urllib3']
