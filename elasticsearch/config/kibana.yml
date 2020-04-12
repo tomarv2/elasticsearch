@@ -27,14 +27,14 @@ xpack:
 #        ldap1:
 #          type: ldap
 #          order: 0
-#          url: "ldaps://10.16.10.15:389"
-#          bind_dn: "cn=admin,ou=Service Accounts,ou=devlabs,dc=devlabs,dc=corp"
+#          url: "ldaps://10.10.10.11:389"
+#          bind_dn: "cn=admin,ou=Service Accounts,ou=demo,dc=demo,dc=corp"
 #          bind_password: Dev123
 #          user_search:
-#            base_dn: "dc=devlabs,dc=corp"
+#            base_dn: "dc=demo,dc=corp"
 #            attribute: userPrincipalName
 #          group_search:
-#            base_dn: "dc=devlabs,dc=corp"
+#            base_dn: "dc=demo,dc=corp"
 #          files:
 #            role_mapping: "role_mapping.yml"
 #          unmapped_groups_as_roles: false

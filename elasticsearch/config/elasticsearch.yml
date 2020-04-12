@@ -43,13 +43,13 @@ xpack:
 #              type: ldap
 #              order: 0
 #              url: "ldap://10.6.10.25:389"
-#              bind_dn: "admin,OU=Service Accounts,OU=devlabs,DC=devlabs,DC=corp"
+#              bind_dn: "admin,OU=Service Accounts,OU=demo,DC=demo,DC=corp"
 #              bind_password: dev_password
 #              user_search:
 #                base_dn: "dc=example,dc=com"
 #                attribute: userPrincipalName
 #              group_search:
-#                base_dn: "DC=devlabs,DC=corp"
+#                base_dn: "DC=demo,DC=corp"
 #              files:
 #                role_mapping: "/usr/share/es/config/role_mapping.yml"
 #              unmapped_groups_as_roles: false

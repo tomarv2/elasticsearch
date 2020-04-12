@@ -1,5 +1,5 @@
 REGISTRY = dcr.xyz.com
-MODULE = devlabs/es
+MODULE = demo/es
 IMAGE = filebeat
 TAG = v1
 
