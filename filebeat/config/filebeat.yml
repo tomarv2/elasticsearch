@@ -5,7 +5,7 @@
 
 output:
   elasticsearch:
-    hosts: ["es.aur.test.xyz.com:9200"]
+    hosts: ["es.demo.xyz.com:9200"]
     index: "kubernetes-logs-%{+yyyy.MM.dd}"
     bulk_max_body_size: 10M
     bulk_max_size: 50
@@ -28,7 +28,7 @@ output:
         when:
           and:
             - contains.source: "redis"
-            - not.contains.source: "dataengr"
+            - not.contains.source: "demo"
       - index: "jenkins-logs-%{+yyyy.MM.dd}"
 #        pipeline: parse_jenkins_log
         template:
@@ -37,27 +37,27 @@ output:
         when:
           or:
             - contains.source: "jenkins"
-      - index: "dw-dataengr-access-logs-%{+yyyy.MM.dd}"
-#        pipeline: parse_dw_dataengr_access_log
+      - index: "dw-demo-access-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_demo_access_log
         template:
           - name: dw-services-access-logs-template
           - path: dw-services-access-logs.template.json
         when:
           and:
-           - contains.source: "dataengr"
+           - contains.source: "demo"
            - not.contains.source: "nifi"
            - not.contains.source: "sync"
            - not.contains.source: "spark"
            - not.contains.source: "transform"
            - equals.stream: "stdout"
-      - index: "dw-dataengr-app-logs-%{+yyyy.MM.dd}"
-#        pipeline: parse_dw_dataengr_app_log
+      - index: "dw-demo-app-logs-%{+yyyy.MM.dd}"
+#        pipeline: parse_dw_demo_app_log
         template:
-          - name: dw-dataengr-app-logs-template
-          - path: dw-dataengr-app-logs.template.json
+          - name: dw-demo-app-logs-template
+          - path: dw-demo-app-logs.template.json
         when:
           and:
-           - contains.source: "dataengr"
+           - contains.source: "demo"
            - not.contains.source: "nifi"
            - not.contains.source: "sync"
            - not.contains.source: "spark"
@@ -173,7 +173,7 @@ output:
 #
       - pipeline: parse_generic_log
         when:
-          contains.source: "zap-blog"
+          contains.source: "demo-blog"
 #
       - pipeline: parse_generic_log
         when:
@@ -213,13 +213,13 @@ output:
         when:
           and:
             - equals.stream: "stdout"
-            - contains.source: "dataengr"
+            - contains.source: "demo"
 #
-      - pipeline: parse_dw_dataengr_app_log
+      - pipeline: parse_dw_demo_app_log
         when:
           and:
             - equals.stream: "stderr"
-            - contains.source: "dataengr"
+            - contains.source: "demo"
 #
       - pipeline: parse_generic_log
 

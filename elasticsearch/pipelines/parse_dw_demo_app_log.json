@@ -31,7 +31,7 @@
           {
             "set": {
               "field": "pipeline_error",
-              "value": "parse_dw_dataengr_app_log"
+              "value": "parse_dw_demo_app_log"
             }
           },
           {

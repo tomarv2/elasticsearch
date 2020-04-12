@@ -32,8 +32,8 @@ spec:
           mountPath: /usr/share/filebeat/jenkins-logs.template.json
           subPath: jenkins-logs.template.json
         - name: filebeat-config-volume
-          mountPath: /usr/share/filebeat/dw-dataengr-app-logs.template.json
-          subPath: dw-dataengr-app-logs.template.json
+          mountPath: /usr/share/filebeat/dw-demo-app-logs.template.json
+          subPath: dw-demo-app-logs.template.json
         - name: filebeat-config-volume
           mountPath: /usr/share/filebeat/spark-logs.template.json
           subPath: spark-logs.template.json

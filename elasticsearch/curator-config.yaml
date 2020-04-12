@@ -119,7 +119,7 @@ data:
           exclude: False
       6:
         action: delete_indices
-        description: "Delete dw-dataengr-logs indexes more than 14 days old"
+        description: "Delete dw-demo-logs indexes more than 14 days old"
         options:
           ignore_empty_list: True
           continue_if_exception: False
@@ -127,7 +127,7 @@ data:
         filters:
         - filtertype: pattern
           kind: regex
-          value: '^.*dw-dataengr.*'
+          value: '^.*dw-demo.*'
           exclude: False
         - filtertype: age
           source: name

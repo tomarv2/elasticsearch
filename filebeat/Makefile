@@ -22,7 +22,7 @@ run:
 
 runj:
 	export DW_ZIPKIN_URL=http://zipkin:9411/ && \
-	export DW_ORACLE_URL=jdbc:oracle:thin:@//devdb2.aur.test.xyz.com:1521/dev2db && \
+	export DW_ORACLE_URL=jdbc:oracle:thin:@//devdb2.demo.xyz.com:1521/dev2db && \
 	export DW_ORACLE_USER=bdr && \
  	export DW_ORACLE_PASS=dev1pass && \
 	java -server -XX:+UseG1GC -XX:+UseStringDeduplication -jar target/autocomplete-0.1-SNAPSHOT.jar server config.yml
