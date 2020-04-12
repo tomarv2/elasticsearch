@@ -1,5 +1,5 @@
 admin:
-  - "CN=dev-ops,OU=Groups,OU=Recipients,OU=devlabs,DC=devlabs,DC=corp"
+  - "CN=demo,OU=Groups,OU=Recipients,OU=demo,DC=demo,DC=corp"
   
 user:
-  - "jira-users,OU=Groups,OU=Recipients,OU=devlabs,DC=devlabs,DC=corp"
+  - "jira-users,OU=Groups,OU=Recipients,OU=demo,DC=demo,DC=corp"
