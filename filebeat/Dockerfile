@@ -1,2 +1,2 @@
-FROM docker.elastic.co/beats/filebeat:6.0.0-alpha1
+FROM elastic/filebeat:7.4.2
 USER root

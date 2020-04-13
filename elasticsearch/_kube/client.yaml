@@ -1,12 +1,16 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: es-client
+  namespace: devops
   labels:
     component: es
     role: client
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      component: es
   template:
     metadata:
       labels:

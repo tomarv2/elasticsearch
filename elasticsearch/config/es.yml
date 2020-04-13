@@ -27,7 +27,7 @@ http:
 
 discovery:
   zen:
-    ping.unicast.hosts: es-discovery
+    ping.unicast.hosts: es-discovery-headless
     minimum_master_nodes: ${NUMBER_OF_MASTERS:1}
 #
 #xpack.monitoring.exporters.my_local:
@@ -42,7 +42,7 @@ xpack:
 #            ldap1:
 #              type: ldap
 #              order: 0
-#              url: "ldap://10.6.10.25:389"
+#              url: "ldap://10.6.10.2:389"
 #              bind_dn: "admin,OU=Service Accounts,OU=demo,DC=demo,DC=corp"
 #              bind_password: dev_password
 #              user_search:

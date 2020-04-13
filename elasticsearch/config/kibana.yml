@@ -1,3 +1,8 @@
+#server.name: kibana
+#server.host: "0"
+#elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+#xpack.monitoring.ui.container.elasticsearch.enabled: true
+
 # Default Kibana configuration from kibana-docker.
 
 server:
@@ -5,20 +10,13 @@ server:
   host: "0"
 
 elasticsearch:
-  url: http://es:9200
+  hosts: [http://elasticsearch:9200]
   requestTimeout: 60000
   shardTimeout: 60000
 
 logging:
   json: false
   verbose: true
-
-#es.username: elastic
-#es.password: changeme
-#xpack.monitoring.ui.container.es.enabled: true
-xpack:
-  security:
-    enabled: false
 
 #xpack:
 #  security:
@@ -29,7 +27,7 @@ xpack:
 #          order: 0
 #          url: "ldaps://10.10.10.11:389"
 #          bind_dn: "cn=admin,ou=Service Accounts,ou=demo,dc=demo,dc=corp"
-#          bind_password: Dev123
+#          bind_password: abc123
 #          user_search:
 #            base_dn: "dc=demo,dc=corp"
 #            attribute: userPrincipalName
@@ -38,8 +36,13 @@ xpack:
 #          files:
 #            role_mapping: "role_mapping.yml"
 #          unmapped_groups_as_roles: false
-#  monitoring:
-#    ui:
-#      container:
-#        es:
-#          enabled: true
+#es.username: elastic
+#es.password: changeme
+
+xpack:
+  security:
+    enabled: false
+  monitoring:
+    ui.container:
+      elasticsearch:
+        enabled: true

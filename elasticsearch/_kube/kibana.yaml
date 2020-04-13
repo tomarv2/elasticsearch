@@ -1,13 +1,16 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kibana
-  namespace: default
+  namespace: devops
   labels:
     component: es
     role: kibana
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      component: es
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -20,7 +23,7 @@ spec:
     spec:
       containers:
       - name: kibana
-        image: docker.elastic.co/kibana/kibana:6.2.0
+        image: kibana:7.4.2
         env:
         - name: XPACK_SECURITY_ENABLED
           value: "false"
@@ -32,6 +35,10 @@ spec:
           value: "false"
         - name: XPACK_WATCHER_ENABLED
           value: "false"
+        - name: ELASTICSEARCH_URL
+          value: http://es:9200
+        - name: ELASTICSEARCH_HOSTS
+          value: http://es:9200
         ports:
         - containerPort: 5601
           name: http
@@ -46,14 +53,35 @@ spec:
         - name: es-config-volume
           mountPath: /usr/share/kibana/config/log4j2.properties
           subPath: log4j2.properties
-        resources:
-          requests:
-            cpu: 4
-            memory: 8Gi
-          limits:
-            cpu: 4
-            memory: 8Gi
+#        resources:
+#          requests:
+#            cpu: 4
+#            memory: 8Gi
+#          limits:
+#            cpu: 4
+#            memory: 8Gi
       volumes:
       - name: es-config-volume
         configMap:
           name: es-config
+
+---
+apiVersion: v1
+kind: Service
+namespace: devops
+metadata:
+  name: kibana
+  namespace: devops
+  labels:
+    component: es
+    role: kibana
+spec:
+  type: NodePort
+  #clusterIP: "None"
+  selector:
+    component: es
+    role: kibana
+  ports:
+  - name: http
+    port: 5601
+    protocol: TCP

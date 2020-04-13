@@ -1,5 +1,5 @@
 {
-  "description": "Dropwizard Service App Log Parser",
+  "description": "DW Service App Log Parser",
   "processors": [
     {
       "grok": {

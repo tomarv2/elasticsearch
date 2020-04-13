@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: ReplicaSet
 metadata:
   name: testcurator
-  namespace: default
+  namespace: devops
 spec:
   replicas: 1
   selector:

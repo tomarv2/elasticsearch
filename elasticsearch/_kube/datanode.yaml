@@ -1,7 +1,8 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: es-data
+  namespace: devops
   labels:
     component: es
     role: data
@@ -9,6 +10,9 @@ spec:
   podManagementPolicy: "Parallel"
   replicas: 6
   serviceName: "es-data"
+  selector:
+    matchLabels:
+      component: es
   template:
     metadata:
       labels:

@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: filebeat-log-shipper
-  namespace: default
+  namespace: devops
 spec:
   template:
     metadata:
@@ -14,7 +14,7 @@ spec:
       containers:
       - name: filebeat-log-shipper
 #        image: docker.elastic.co/beats/filebeat:6.0.0-alpha1
-        image: dcr.xyz.com/demo/es/filebeat:v1
+        image: ecr.demo.com/demo/es/filebeat:v1
         volumeMounts:
         - name: filebeat-config-volume
           mountPath: /usr/share/filebeat/filebeat.yml

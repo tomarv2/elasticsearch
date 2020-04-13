@@ -2,4 +2,4 @@ admin:
   - "CN=demo,OU=Groups,OU=Recipients,OU=demo,DC=demo,DC=corp"
   
 user:
-  - "jira-users,OU=Groups,OU=Recipients,OU=demo,DC=demo,DC=corp"
+  - "demo-users,OU=Groups,OU=Recipients,OU=demo,DC=demo,DC=corp"

@@ -2,18 +2,19 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: es-ingress
+  namespace: devops
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
  rules:
-  - host: es.demo.xyz.com
+  - host: es.demo.com
     http:
       paths:
       - path: /
         backend:
           serviceName: es
           servicePort: 9200
-  - host: kibana.demo.xyz.com
+  - host: kibana.demo.com
     http:
       paths:
       - path: /

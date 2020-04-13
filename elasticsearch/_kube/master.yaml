@@ -1,14 +1,21 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: es-master
+  namespace: devops
   labels:
     component: es
     role: master
 spec:
-  replicas: 3
+  replicas: 1 #3
   serviceName: "es-master-ss"
-#  "podManagementPolicy": "Parallel"
+  selector:
+    matchLabels:
+      component: es
+  #------------------------------------
+  #NOTE:
+  #------------------------------------
+  #podManagementPolicy: "Parallel"
   template:
     metadata:
       labels:
@@ -24,35 +31,33 @@ spec:
           capabilities:
             add:
               - IPC_LOCK
-        image: docker.elastic.co/es/es:6.2.0
-        imagePullPolicy: Always
+        image: elasticsearch:7.4.2
+#        imagePullPolicy: Always
         env:
+        #------------------------------------
+        #NOTE:
+        #------------------------------------
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: CLUSTER_NAME
-          value: "demo"
-        - name: NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
         - name: "NUMBER_OF_MASTERS"
-          value: "2"
+          value: "1"
         - name: NODE_MASTER
           value: "true"
         - name: NODE_INGEST
-          value: "false"
+          value: "true"
         - name: NODE_DATA
-          value: "false"
-        - name: HTTP_ENABLE
-          value: "false"
-        - name: MAX_LOCAL_STORAGE_NODES
-          value: "10"
+          value: "true"
+#        - name: HTTP_ENABLE
+#          value: "false"
+#        - name: MAX_LOCAL_STORAGE_NODES
+#          value: "10"
         - name: XPACK_SECURITY_ENABLED
           value: "false"
         - name: "ES_JAVA_OPTS"
-          value: "-Xms4g -Xmx4g"
+          #value: "-Xms4g -Xmx4g -Des.enforce.bootstrap.checks=true"
+          value: "-Des.enforce.bootstrap.checks=true"
         - name: XPACK_SECURITY_ENABLED
           value: "false"
         - name: XPACK_MONITORING_ENABLED
@@ -63,28 +68,40 @@ spec:
           value: "false"
         - name: XPACK_WATCHER_ENABLED
           value: "false"
+        - name: discovery.type
+          value: "single-node"
+        - name: cluster.name
+          value: demo
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+#        - name: discovery.seed_hosts
+#          value: "es-cluster-0.elasticsearch,es-cluster-1.elasticsearch,es-cluster-2.elasticsearch"
+#        - name: cluster.initial_master_nodes
+#          value: "es-cluster-0,es-cluster-1,es-cluster-2"
         ports:
         - containerPort: 9300
           name: transport
           protocol: TCP
         volumeMounts:
-        - name: data-volume
-          mountPath: /var/lib/es
-        - name: log-volume
-          mountPath: /var/log/es
+#        - name: data-volume
+#          mountPath: /var/lib/es
+#        - name: log-volume
+#          mountPath: /var/log/es
         - name: es-config-volume
           mountPath: /usr/share/es/config/es.yml
           subPath: es.yml
         - name: es-config-volume
           mountPath: /usr/share/es/config/log4j2.properties
           subPath: log4j2.properties
-        resources:
-          requests:
-            cpu: 2000m
-            memory: 8Gi
-          limits:
-            cpu: 4000m
-            memory: 8Gi
+#        resources:
+#          requests:
+#            cpu: 2000m
+#            memory: 8Gi
+#          limits:
+#            cpu: 4000m
+#            memory: 8Gi
         readinessProbe:
           tcpSocket:
             port: 9300
@@ -109,15 +126,15 @@ spec:
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
-  volumeClaimTemplates:
-  - metadata:
-      name: data-volume
-      annotations:
-        volume.beta.kubernetes.io/storage-class: thick-disk
-#        volume.beta.kubernetes.io/storage-class: gp2
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: data-volume
+#      annotations:
+#        volume.beta.kubernetes.io/storage-class: thick-disk
+##        volume.beta.kubernetes.io/storage-class: gp2
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      resources:
+#        requests:
+#          storage: 1Gi
 

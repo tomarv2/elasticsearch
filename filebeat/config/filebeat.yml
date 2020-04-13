@@ -1,11 +1,11 @@
- processors:
+processors:
 - kubernetes:
     in_cluster: true
     namespace: default
 
 output:
   elasticsearch:
-    hosts: ["es.demo.xyz.com:9200"]
+    hosts: ["es.demo.com:9200"]
     index: "kubernetes-logs-%{+yyyy.MM.dd}"
     bulk_max_body_size: 10M
     bulk_max_size: 50
@@ -110,11 +110,6 @@ output:
           and:
             - equals.stream: "stdout"
             - not.contains.source: "_services_"
-      - index: "lms-drupal-stdout-logs-%{+yyyy.MM.dd}"
-        when:
-          and:
-            - equals.stream: "stdout"
-            - contains.source: "lms-drupal"
       - index: "sonarqube-logs-%{+yyyy.MM.dd}"
         template:
           - name: sonarqube-logs-template
@@ -159,25 +154,9 @@ output:
         when:
           contains.source: "grafana"
 #
-      - pipeline: parse_lms_log
-        when:
-          contains.log: "lms-drupal"
-#
       - pipeline: parse_zipkin_log
         when:
           contains.source: "zipkin"
-#
-      - pipeline: parse_generic_log
-        when:
-          contains.source: "zip-blog"
-#
-      - pipeline: parse_generic_log
-        when:
-          contains.source: "demo-blog"
-#
-      - pipeline: parse_generic_log
-        when:
-          contains.source: "cb-landing"
 #
       - pipeline: parse_generic_log
         when:
@@ -245,7 +224,6 @@ filebeat:
         message_key: log
       multiline.negate: false
       multiline.match: after
-      multiline.negate: false
       multiline.pattern: '^${patterns.format2}'
   registry_file: /var/lib/filebeat/registry
 patterns:
