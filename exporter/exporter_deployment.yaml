@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: es-exporter
+  name: es-exporter
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: es-exporter
+  template:
+    metadata:
+      labels:
+        app: es-exporter
+    spec:
+      containers:
+        - name: es-exporter
+          image: justwatch/elasticsearch_exporter:1.1.0
+#          env:
+#            - name: "REDIS_ADDR"
+#              value: "demo-redis.services:6379"
+          ports:
+            - name: exporter
+              containerPort: 9114
+#          resources:
+#            requests:
+#              cpu: 100m
+#              memory: 500Mi
+#            limits:
+#              cpu: 100m
+#              memory: 500Mi
